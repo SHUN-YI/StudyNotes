@@ -296,13 +296,16 @@ console.log(out) // 只狼是一个忠心的忍者
     2.  原生具备iterator接口的数据
 
         *   Array
+
         *   Arguments
+
         *   Set
+
         *   Map
+
         *   String
+
         *   TypedArray
-
-
 
         *   NodeList
 
@@ -604,17 +607,215 @@ m.set(key,['北京'])
 
 ### 18.模块化
 
+*   模块化是指讲一个大的程序文件，拆分成许多小的文件，然后将小文件组合起来
+*   模块化的好处
 
+    1.  防止命名冲突
+    2.  代码复用
+    3.  高维护性
+*   es6之前的模块化规范
 
+    1.  `commonJs => NodeJs,Browserify`
+    2.  `AMD => requireJS`
+    3.  `CMD => seaJS`
+*   es6模块化语法
 
+    1.  import // 引入
 
+        ```javascript
+        // 通用导入方式
+        import * as M1(文件名称) from "./M1.js"
 
+        // 解构赋值形式
+        import {A,fn1} from "./M1.js"
+        //若是有重名情况可如下处理
+        import {A as a,fn1} from "./M1.js" //A的值就赋给a了
+        // 若引入的文件写法是默认暴露，可按下方形式引入
+        import {default as m3} from "./M1.js"
 
+        // 简写形式-要求引入的必须是默认暴露
+        import m3 from "./M1.js"
+        ```
+    2.  export //暴露出去
 
+        ```javascript
+        // ==== 这是M1.js文件 ====
 
+        // 分别暴露
+        export let A = 'XXX'
+        export function fn1 (){console.log('xxx')}
 
+        // 统一暴露
+        let A = 'XXX'
+        function fn1 (){console.log('xxx')};
+        export {A, fn1};
 
+        // 默认暴露
+        export default {
+          school: 'xxx'
+          change: function fn1 (){console.log('xxx')}
+        }
 
+        ```
+*   babel对es6模块化的代码装换
+
+    1.  考虑各种浏览器兼容问题需要用到bable来进行转化
+    2.  babel是js的一个编译器
+
+        ```javascript
+        //安装工具 babel-cil babel-preset-env browserify
+        //npx babel sec/js -d dist/js
+        //打包 npx browserify dist/js/app.js -o dist/bundle.js
+        ```
+
+## ES7新特性
+
+### 1.includes
+
+includes方法用来检测数组中是否包含某个元素，返回boolean值
+
+### 2.\*\*
+
+*   指数操作符
+
+```javascript
+Math.pow(2,10) === 2**10 // true
+```
+
+## ES8新特性
+
+### 1.async\&await
+
+*   async声明一个async函数
+
+    1.  async函数返回一个promise对象
+    2.  promise对象的结果由async函数执行的返回值决定
+
+    ```javascript
+     // 返回的不是promise类型的对象，result则接收到一个成功的promise
+    async function fn(){ 
+      return '哈哈'
+    }
+
+     // 若抛出出了错误，如此则返回一个失败的promise
+    async function fn(){ 
+      throw new Error('出错')
+    }
+
+     // 若返回的是一个promise对象，则取决于你返回对象的状态
+    async function fn(){ 
+      return new Promise((resolve,reject) => {
+    		resolve()
+            reject()
+      })
+    }
+    const result = fn()
+    ```
+
+*   await表达式
+
+    1.  必须卸载async函数中
+    2.  await右侧表达式一般是promise对象
+    3.  await返回的是promise成功的值
+    4.  await的promise失败了，就抛出异常，要通过try...catch捕获
+
+    ```javascript
+    let p = new Promise((resolve,reject) => {
+    		resolve('成功')
+    })
+    async function fn(){ 
+      try {
+    	let result = await p
+        console.log(result)
+      }catch(e){
+        console.log(e)
+      }  
+    }
+    fn() // 成功
+    ```
+
+*   封装ajax请求
+    ```javascript
+     function sendAJAX(URL) {
+      return new Promise((resolve,reject) => {
+        const x new XMLHttpRequest();
+        x.open('GET', URL);
+        x.send();
+        x.onreadystatechange = function(){
+          if (x.readyState === 4) {
+            if(x.status >=200 && x.status <300) {
+              resolve()
+            }else{
+              reject(x.status)
+            }
+          }
+        }
+      })
+     }
+
+    async function main(){
+     let result = await sendAJAX('https://......')
+    }
+    ```
+
+### 2.对象方法扩展
+
+*   `Object.keys()`获取对象所有的键
+*   `Object.values()`获取对象所有的值
+*   `Object.entries()`把对象改成数组，键值形式也改成数组形式，如下
+
+    ```javascript
+    let a = {
+     name: '只狼',
+     weapon: ['楔丸','拜泪']
+    }
+    object.entries(a) //把数据加工成如下
+    [
+     ['name','只狼'],
+     ['weapon', ['楔丸','拜泪']]
+    ]
+
+    ```
+*   `Object.getOwnPropertyDescriptors()`对象属性的描述对象
+
+## ES9的新特性
+
+### 1.扩展运算符和Rest参数
+
+*   Rest参数和spread 扩展运算符在es6中已经引入，不过是只针对数组的
+*   es9中为对象提供了像数组一样的rest参数和扩展运算符
+
+    ```javascript
+    function date({name,sex,...data}) {
+     console.log(name) // '只狼'
+     console.log(sex) // '男'
+     console.log(data) // {career:'忍者', weapon:['楔丸','拜泪']}
+    }
+    date({
+     name: '只狼',
+     sex: '男',
+     career: '忍者',
+     weapon: ['楔丸','拜泪']
+    })
+    ```
+*   扩展对象
+
+    ```javascript
+    const A = {name: '只狼'}
+    const B = {sex: '男'}
+    const C = {career: '忍者'}
+    const D = {weapon: ['楔丸','拜泪']}
+    // 合并对象
+    const Sekiro = {...A,...B,...C,...D}
+    ```
+
+### 2.正则扩展
+
+*   ...
+
+## ES10新特性
+
+### 1.对象扩展方法
 
 
 
