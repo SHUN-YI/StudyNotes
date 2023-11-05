@@ -188,7 +188,7 @@ console.log(out) // 只狼是一个忠心的忍者
 
     ```
 
-### 8. rest参数
+### 8.rest参数
 
 *   es6引入rest参数，用于获取函数的实参，用来代替arguments
 *   获取实参的方式
@@ -357,7 +357,7 @@ console.log(out) // 只狼是一个忠心的忍者
                       } elsSymbol.iterator
             ```
 
-### 12.生成器&#x20;
+### 12.Generator
 
 *   es6提供的一种异步解决方案，语法行为和传统函数不同
 *   通过next()来控制代码执行
@@ -668,11 +668,49 @@ m.set(key,['北京'])
         //打包 npx browserify dist/js/app.js -o dist/bundle.js
         ```
 
+### 19.Proxy代理
+
+*   作用是在对象和对象的属性值之间设置一个代理，获取该对象的值或者是设置该对象的值，以及实例化等等多种操作都会被拦截住。经过这一层之后我们可以统一处理。
+
+    ```javascript
+    let target = {}
+    let proxy = new Proxy(target,{
+     // 获取
+     get(target, prop) {
+       return target[prop]
+     }
+     // 修改
+     set(target,key,value) {
+      target[key] = value
+     }
+    })
+    ```
+
+### 20.Reflect反射
+
+*   es6中新增的内置对象，用于实现一些与对象相关的操作。
+*   Reflect 不是一个函数对象，所以它是不可构造的，也就是说它不是一个构造器，不能通过 new 操作符去新建或者将其作为一个函数去调用 Reflect 对象。
+
+    1.  `Reflect.get()`获取对象身上某个属性的值
+    2.  `Reflect.set()`在对象上设置属性
+    3.  `Reflect.has()`判断一个对象是否存在某个属性
+    4.  `Reflect.deleteProperty()`删除对象上的属性
+    5.  `Reflect.getPrototypeOf()`获取指定对象原型的函数
+    6.  `Reflect.setPrototypeOf()`设置或改变对象原型的函数
+    7.  `Reflect.isExtensible()`判断一个对象是否可扩展 （即是否能够添加新的属性）
+    8.  `Reflect.preventExtensions()`阻止新属性添加到对象
+    9.  `Reflect.getOwnPropertyDescriptor()`获取给定属性的属性描述符
+    10. `Reflect.defineProperty()`定义或修改一个对象的属性
+    11. `Reflect.ownKeys()`返回由目标对象自身的属性键组成的数组
+    12. `Reflect.apply()`对一个函数进行调用操作，同时可以传入一个数组作为调用参数
+    13. `Reflect.construct()`对构造函数进行 new 操作，实现创建类的实例
+    14. `Reflect.preventExtensions()`阻止新属性添加到对象
+
 ## ES7新特性
 
 ### 1.includes
 
-includes方法用来检测数组中是否包含某个元素，返回boolean值
+*   includes方法用来检测数组中是否包含某个元素，返回boolean值
 
 ### 2.\*\*
 
@@ -817,9 +855,383 @@ Math.pow(2,10) === 2**10 // true
 
 ### 1.对象扩展方法
 
+*   Object.fromEntries 创建一个对象，参数需是二维数组或者map
+
+    ```javascript
+    const result = Object.fromEntries([
+     ['name','只狼'],
+     ['weapon', '楔丸,拜泪']
+    ])
+    // 转化如下
+    {
+     name: '只狼',
+     weapon: '楔丸,拜泪'
+    }
+
+    // =================================
+
+    const m = new Map()
+    m.set('name','只狼')
+    const result = Object.fromEntries(m)
+    // m变成了
+    {
+     name: '只狼'
+    }
+
+    ```
+
+### 2.字符串方法扩展
+
+*   trimStart 清除字符串左侧空白字符
+*   trimEnd 清除字符串右侧空白字符
+*   trim(es5的方法，清除字符串两边的字符)
+
+### 3.数组方法扩展
+
+*   flat把多维数组转化为低维数组
+
+    ```javascript
+    const arr = [
+     1,
+     [2,3,4],
+    ]
+
+    arr.flat() // [1,2,3,4]
+
+    //-----转化多维数组时候，从外面开始转-----
+
+    const arr = [
+     1,
+     [2,3,4,[5,6,7,8]],
+    ]
+    arr.flat() // [1,2,3,4,[5,6,7,8]]
+
+    // ------可传参，表示转化的深度--------
+
+    const arr = [
+     1,
+     [2,3,4,[5,6,7,8]],
+    ]
+    arr.flat(2) // [1,2,3,4,5,6,7,8]
+    ```
+*   flatMap类似map方法和flat方法的结合
+
+    ```javascript
+    const arr = [
+     1,2,3,4,5
+    ]
+    arr.flatMap(item => [item * 10])
+    // 若使用map则返回[[10],[20],[30],[40],[50]]
+    // 使用flatMap则返回[10,20,30,40,50]
+    ```
+
+### 4.Symbol扩展
+
+*   Symbol.prototype.description 获取Symbol的字符串描述
+
+    ```javascript
+    let s = Symbol('aaa')
+    s.description  // 'aaa'
+    ```
+
+## ES11新特性
+
+### 1.私有属性
+
+```javascript
+class Phone {
+  brand;
+  #price;
+  constructor(brand,price){
+    this.brand = brand
+    this.#price = price
+  }
+}
+// 实例化
+const mi = new Phone('MI','999')
+console.log(mi.brand) // 可正常访问
+console.log(mi.#price) // 理论上不可访问，但是写出来还是能访问，说好的私有属性呢？好怪？？
+```
+
+### 2.Promise.allSettled
+
+*   接受一个promise数组，返回一个promise对象，返回的结果是成功的状态。成功的值是里面每一个promise的结果
+
+    ```javascript
+    // 声明两个Promise对象
+    const p1 = new Promise(function(resolve,reject){
+      // 此处写异步操作
+      setTimeout(function(){
+         let data = '数据1'
+         resolve(data)
+      }, 1000)
+    })
+    const p2 = new Promise(function(resolve,reject){
+      // 此处写异步操作
+      setTimeout(function(){
+         let data = '数据2'
+         resolve(data)
+      }, 1000)
+    })
+    const result = Promise.allSettled([p])
+
+    // 和Promise.all一样都是执行批量异步任务 ，如果每个任务你都需要结果,就用Promise.allSettled。如果需要每个任务都成功才能执行就用Promise.all
+    ```
+
+### 3.字符串方法扩展
+
+*   metchAll 批量获取正则批量匹配的一个结果
+
+### 4.可选链操作符
+
+*   `?.`   应对对象类型参数，层级可能很深解决层级判断问题
+
+    ```javascript
+    function main(config){
+     // 获取之前要判断数据是否有无，就很麻烦
+     const dbHost = config && config.db && config.db.host
+     // 有这个?.就行
+     const dbHost =config?.db?.host
+
+    }
+    main({
+     db:{
+       host:'192.168.1.1',
+       userName: 'root' 
+     }
+    })
+    ```
+
+### 5.动态import
+
+*   import()函数，返回promise对象
+
+    ```javascript
+    import('./hello.js').then((resolve) => {
+      resolve // 引入的模块
+    })
+    ```
+
+### 6.Biglnt
+
+*   语法：普通整型数字基础上，加一个`n`
+
+    ```javascript
+    let n = 12n;
+    // n 变成大整型了
+
+    Biglnt(n)
+    // n 变成大整型了
+
+    Biglnt(1.2) //报错。不可用浮点型
+
+    // 大数值运算
+    let max = Number.MAX.SAFE_INTEGET
+    max + 1
+    max + 2  // 错误结果，无法运算了
+
+    Biglnt(max)
+    Biglnt(max) + Biglnt(1)
+    Biglnt(max) + Biglnt(2) //正确结果
+    ```
+*   主要用于大数值运算，计算的时候必须是BigInt类型和BigInt类型去计算，否则会报错
+
+### 7.绝对全局对象
+
+*   globalThis 若想对全局对象进行操作，可忽略环境，直接使用globalThis操作
+
+### 8.空值合并运算符
+
+*   `??` 是一个逻辑运算符，当左侧为null或者undefined的时候，返回右侧的操作数，否则返回左侧操作数
+*   和||的区别就是||会把0和控字符串转化为false,显示右侧的值
 
 
 
+    ```javascript
+    (0 || '哈哈') // 哈哈
+    (0 ?? '哈哈') // 0
+
+    ```
+
+## ES12新特性
+
+### 1.逻辑赋值操作符
+
+*   ??=
+*   &&=
+*   ||=
+
+    ```javascript
+    let a = true
+    let b = false
+
+    a = a && b //若想结果赋值给对比的某一项，以前的写法，a为false
+    a &&= b //新写法 a也赋值为false了
+
+    a = a || b
+    a ||= b
+
+    a = a ?? b
+    a ??= b
+    ```
+
+### 2.数字分割符
+
+*   这个新特性是方便程序员看代码出现的，如果数字比较大，不便于查看，它允许我们在数字之间添加下划线(\_)字符，使数字更具可读性
+
+### 3.replaceAll
+
+*   `replaceAll()` 方法用于在字符串中用一些字符替换另一些字符，或替换一个与正则表达式匹配的子串，该函数会替换所有匹配到的子字符串。
+
+    ```javascript
+    var str="Visit Microsoft! Visit Microsoft!";
+    var n=str.replaceAll("Microsoft","Runoob");
+    n // Visit Runoob!Visit Runoob!
+    ```
+
+### 4.Promise.race
+
+*   `Promise.all()`方法用于将多个 `Promise` 实例，包装成一个新的 `Promise` 实例。
+
+    `Promise.all()`全部子实例都成功才算成功，有一个子实例失败就算失败。
+*   `Promise.race()`方法也是将多个 `Promise` 实例，包装成一个新的 `Promise` 实例。
+
+    `Promise.race()`rece是赛跑机制，要看最先的promise子实例是成功还是失败。
+*   `Promise.any()`方法同样是将多个 `Promise` 实例，包装成一个新的 `Promise` 实例。
+
+    `Promise.any()`有一个子实例成功就算成功，全部子实例失败才算失败。
+
+### 5.WeakRefs
+
+*   ​WeakRef​​​是一个 Class，一个​​WeakRef​​​对象可以让你拿到一个对象的弱引用。这样，就可以不用阻止垃圾回收这个对象了。 可以使用其构造函数来创建一个​​WeakRef​​对象。
+
+## &#x20;ES13新特性
+
+### 1.顶层 await 表达式
+
+*   以往我们总是在异步函数体内使用 await 表达式，自 ES13 后，我们也可以在一个模块的顶层使用它了。
+
+    ```javascript
+    // 异步加载资源
+    import { fetchPerson } from '@/services/person';
+    const person = await fetchPerson();
+
+    // 异步加载组件
+    await import('your-component-path');
+
+    import { get } from '@/utils/request';
+
+    export async function getPerson() {
+        const person = await get('/person');
+        return person;
+    }
+    ```
+
+### 2.class新特性
+
+*   在类的定义中，以 "#" 开头的标识符为私有标识符，由私有标识符定义的类元素被称为私有类元素，私有类元素只能在类中才能被访问到。类的属性、静态属性、方法、静态方法、访问器、静态访问器都可以被定义为私有类元素。
+*   静态块，静态块为我们提供了更加灵活的静态类元素初始化渠道，我们可以在静态块中使用一系列的语句来完成静态类元素的初始化。我们可以利用 this 在静态块中访问类的其他静态属性（包括私有属性）。
+
+    ```javascript
+    class ClassA {
+        // 静态属性
+        static staticProperty;
+
+        // 静态块初始化静态属性，捕捉错误
+        static {
+            try {
+                this.staticProperty = getStaticProperty();
+            } catch {
+                console.log('Error');
+            }
+        }
+    }
+    ```
+*   私有in操作符， in 操作符可以帮我们判断实例中是否存在属性，当新增了私有化类元素后，我们也可以和下面例子一样，在类定义内使用 in 操作符判断私有化类元素存在与否。
+
+    ```javascript
+    class ClassA {
+        // 私有属性
+        #privateProperty;
+
+        // 利用 in 操作符判断私有属性是否存在
+        static hasPrivateProperty(instance) {
+            return #privateProperty in instance
+        }
+
+        constructor(privateProperty) {
+            this.#privateProperty = privateProperty;
+        }
+    }
+
+    const instance = new ClassA('private-property');
+    ClassA.hasPrivateProperty(instance);
+    // true
+    ```
+
+
+
+### 3.正则 /d 标志
+
+*   ES13 新增的 d 标志对应正则实例的 hasIndices 属性，当设置 d 标志时，hasIndices 为 true 。使用 d 标志后，正则表达式的匹配结果将包含每个捕获组捕获子字符串的开始和结束游标。
+
+    ```javascript
+    // 字符串
+    const str = "today is saturday";
+
+    // 正则表达式
+    const reg = /saturday/d;
+
+    // 匹配结果输出游标
+    const [start, end] = reg.exec(str).indices[0];
+
+    console.log([start, end]); // [9, 17]
+    ```
+
+### 4.Error 对象的 cause 属性
+
+*   在以往 Error 对象只能传递消息信息，现在 ES13 为 Error 增添了 cause 属性，它可以是任意数据类型，方便我们获取更多地错误信息。
+
+    ```javascript
+    try {
+        // 抛出带 cause 属性的 Error实例
+        throw new Error('faied message', { cause: 'cause' });
+    } catch (error) {
+        // 捕获 error 并输出 cause
+        console.log(error.cause)
+    }
+
+    // 输出
+    // cause
+    ```
+
+### 5.at 方法
+
+*   利用下标访问数组元素时，下标会被转换为字符串，负数下标也对应着一个独立的数组元素，所以 Js 的数组是不支持关联访问的。ES13 新增了 at 方法，使得我们可以利用负数索引进行关联访问，例如以下示例，我们可以利用 at 方法和负数索引 -2 来访问倒数第二个元素。
+
+    ```javascript
+    const array = [5, 12, 8, 130, 44];
+
+    array.at(-2); // 130
+    ```
+
+### 6.Object.hasOwn
+
+*   判断这个实例上是否有属性，以代替之前的 Object.prototype.hasOwnProperty 方法。
+
+    ```javascript
+    const object = {
+        count: 1
+    };
+
+    Object.hasOwn(object, 'count'); // true
+    Object.hasOwn(object, 'toString'); // false
+    Object.hasOwn(object, 'property'); // false
+    ```
+
+## &#x20;ES14新特性
+
+### 更新中...
 
 
 
